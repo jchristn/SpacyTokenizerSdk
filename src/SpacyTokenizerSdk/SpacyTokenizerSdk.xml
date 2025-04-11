@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SpacyTokenizerSdk</name>
+    </assembly>
+    <members>
+        <member name="T:SpacyTokenizerSdk.BatchTokenizationResult">
+            <summary>
+            Batch tokenization result.
+            </summary>
+        </member>
+        <member name="P:SpacyTokenizerSdk.BatchTokenizationResult.Results">
+            <summary>
+            Results.
+            </summary>
+        </member>
+        <member name="M:SpacyTokenizerSdk.BatchTokenizationResult.#ctor">
+            <summary>
+            Batch tokenization result.
+            </summary>
+        </member>
+        <member name="T:SpacyTokenizerSdk.SpacyTokenizer">
+            <summary>
+            SDK for spaCy tokenizer microservice (see https://hub.docker.com/r/jchristn/spacytokenizer).
+            </summary>
+        </member>
+        <member name="P:SpacyTokenizerSdk.SpacyTokenizer.Endpoint">
+            <summary>
+            Endpoint URL, of the form http://localhost:8000/.
+            </summary>
+        </member>
+        <member name="M:SpacyTokenizerSdk.SpacyTokenizer.#ctor(System.String)">
+            <summary>
+            SDK for spaCy tokenizer microservice (see https://hub.docker.com/r/jchristn/spacytokenizer).
+            </summary>
+            <param name="endpoint">Endpoint URL, of the form http://localhost:8000/.</param>
+        </member>
+        <member name="M:SpacyTokenizerSdk.SpacyTokenizer.ValidateConnectivity(System.Threading.CancellationToken)">
+            <summary>
+            Validate connectivity to the spaCy tokenizer.
+            HEAD /
+            </summary>
+            <param name="token">Cancellation token.</param>
+            <returns>True if connected.</returns>
+        </member>
+        <member name="M:SpacyTokenizerSdk.SpacyTokenizer.Tokenize(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Tokenize a line of text.
+            </summary>
+            <param name="text">Text.</param>
+            <param name="token">Cancellation token.</param>
+            <returns>Tokenization result.</returns>
+        </member>
+        <member name="M:SpacyTokenizerSdk.SpacyTokenizer.Tokenize(System.Collections.Generic.List{System.String},System.Threading.CancellationToken)">
+            <summary>
+            Tokenize a list of lines of text.
+            </summary>
+            <param name="texts">Lines of text.</param>
+            <param name="token">Cancellation token.</param>
+            <returns>Batch tokenization result.</returns>
+        </member>
+        <member name="T:SpacyTokenizerSdk.TokenizationRequest">
+            <summary>
+            Tokenization request.
+            </summary>
+        </member>
+        <member name="P:SpacyTokenizerSdk.TokenizationRequest.Text">
+            <summary>
+            Text.
+            </summary>
+        </member>
+        <member name="P:SpacyTokenizerSdk.TokenizationRequest.Texts">
+            <summary>
+            Texts.
+            </summary>
+        </member>
+        <member name="M:SpacyTokenizerSdk.TokenizationRequest.#ctor">
+            <summary>
+            Tokenization request.
+            </summary>
+        </member>
+        <member name="T:SpacyTokenizerSdk.TokenizationResult">
+            <summary>
+            Tokenization result.
+            </summary>
+        </member>
+        <member name="P:SpacyTokenizerSdk.TokenizationResult.Text">
+            <summary>
+            Text.
+            </summary>
+        </member>
+        <member name="P:SpacyTokenizerSdk.TokenizationResult.Tokens">
+            <summary>
+            Tokens.
+            </summary>
+        </member>
+        <member name="M:SpacyTokenizerSdk.TokenizationResult.#ctor">
+            <summary>
+            Tokenization result.
+            </summary>
+        </member>
+    </members>
+</doc>
