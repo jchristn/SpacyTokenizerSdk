@@ -1,4 +1,4 @@
-﻿![supersimpletcp](https://github.com/jchristn/spacytokenizersdk/blob/main/assets/icon.ico)
+﻿![SpacyTokenizerSdk](https://github.com/jchristn/spacytokenizersdk/blob/main/assets/icon.ico)
 
 # spaCy Tokenizer SDK
 
