@@ -1,4 +1,4 @@
-namespace SpacyTokenizerSdk.Tests
+namespace Test.Shared
 {
     using System;
     using System.Collections.Generic;
@@ -13,6 +13,9 @@ namespace SpacyTokenizerSdk.Tests
     /// Minimal in-process HTTP/1.1 server used to exercise the SDK without the live
     /// spaCy tokenizer Docker service. Uses a raw TcpListener bound to 127.0.0.1 on an
     /// OS-assigned port so no admin rights or URL ACL reservations are required.
+    ///
+    /// The server lives in Test.Shared so every Touchstone host (CLI, xUnit, NUnit, MSTest)
+    /// exercises the SDK against identical, deterministic HTTP behavior.
     /// </summary>
     public sealed class MockHttpServer : IDisposable
     {
