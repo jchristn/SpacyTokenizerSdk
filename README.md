@@ -2,7 +2,7 @@
 
 # spaCy Tokenizer SDK
 
-spaCy tokenizer SDK.  This SDK uses the spaCy tokenizer docker image found [here](https://hub.docker.com/r/jchristn/spacytokenizer) (repository for the Docker image is [here](https://github.com/jchristn/spacytokenizer)).
+spaCy tokenizer SDK.  This SDK uses the spaCy tokenizer docker image found [here](https://hub.docker.com/r/jchristn77/spacytokenizer) (repository for the Docker image is [here](https://github.com/jchristn/spacytokenizer)).
 
 ## New in v1.0.x
 
