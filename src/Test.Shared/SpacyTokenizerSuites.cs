@@ -242,6 +242,20 @@ namespace Test.Shared
                         }
                     }),
 
+                Case(suite, "Returns204_ReturnsFalse",
+                    "ValidateConnectivity treats a non-200 success code (204) as not connected",
+                    async ct =>
+                    {
+                        // The SDK checks for exactly 200; any other 2xx must report not-connected.
+                        using (MockHttpServer server = new MockHttpServer(req =>
+                            new MockHttpServer.Response { StatusCode = 204 }))
+                        {
+                            SpacyTokenizer t = new SpacyTokenizer(server.Endpoint);
+                            bool connected = await t.ValidateConnectivity(ct);
+                            Check.False(connected, "Expected connectivity to fail on 204.");
+                        }
+                    }),
+
                 Case(suite, "Cancelled_Throws",
                     "ValidateConnectivity throws when the token is already cancelled",
                     async ct =>
@@ -418,6 +432,85 @@ namespace Test.Shared
                         }
                     }),
 
+                Case(suite, "Server202_ReturnsNull",
+                    "Tokenize(string) returns null on a non-200 success code (202)",
+                    async ct =>
+                    {
+                        // Only HTTP 200 is treated as success; other 2xx codes yield null.
+                        using (MockHttpServer server = new MockHttpServer(req =>
+                            new MockHttpServer.Response
+                            {
+                                StatusCode = 202,
+                                Body = "{\"text\":\"x\",\"tokens\":[\"x\"]}"
+                            }))
+                        {
+                            SpacyTokenizer t = new SpacyTokenizer(server.Endpoint);
+                            TokenizationResult result = await t.Tokenize("Hello world", ct);
+                            Check.Null(result);
+                        }
+                    }),
+
+                Case(suite, "WhitespaceText_IsTransmitted",
+                    "Tokenize(string) accepts whitespace-only text and transmits it (guard rejects only null/empty)",
+                    async ct =>
+                    {
+                        MockHttpServer.Request captured = null;
+                        using (MockHttpServer server = new MockHttpServer(req =>
+                        {
+                            captured = req;
+                            return new MockHttpServer.Response
+                            {
+                                StatusCode = 200,
+                                Body = "{\"text\":\" \",\"tokens\":[]}"
+                            };
+                        }))
+                        {
+                            SpacyTokenizer t = new SpacyTokenizer(server.Endpoint);
+                            TokenizationResult result = await t.Tokenize("   ", ct);
+
+                            Check.NotNull(result);
+                            Check.NotNull(captured, "Server should have received a request.");
+                            Check.Equal("POST", captured.Method);
+                            Check.Equal("/tokenize", captured.Path);
+
+                            // The whitespace payload must survive to the wire under the "text" field.
+                            using (JsonDocument doc = JsonDocument.Parse(captured.Body))
+                            {
+                                string sent = doc.RootElement.GetProperty("text").GetString();
+                                Check.Equal("   ", sent);
+                            }
+                        }
+                    }),
+
+                Case(suite, "MalformedJson_Throws",
+                    "Tokenize(string) surfaces a deserialization error for malformed JSON on HTTP 200",
+                    async ct =>
+                    {
+                        using (MockHttpServer server = new MockHttpServer(req =>
+                            new MockHttpServer.Response
+                            {
+                                StatusCode = 200,
+                                Body = "{ this is not valid json "
+                            }))
+                        {
+                            SpacyTokenizer t = new SpacyTokenizer(server.Endpoint);
+
+                            // The SDK does not swallow malformed payloads; deserialization must throw
+                            // rather than silently returning a partially-populated or null result.
+                            bool threw = false;
+                            try
+                            {
+                                await t.Tokenize("Hello world", ct);
+                            }
+                            catch (Exception)
+                            {
+                                threw = true;
+                            }
+
+                            Check.True(threw, "Expected a deserialization exception for malformed JSON.");
+                        }
+                    }),
+
                 Case(suite, "NullText_Throws",
                     "Tokenize(string) throws ArgumentNullException for null text",
                     async _ =>
@@ -584,6 +677,57 @@ namespace Test.Shared
                             SpacyTokenizer t = new SpacyTokenizer(server.Endpoint);
                             BatchTokenizationResult result = await t.Tokenize(new List<string> { "one", "two" }, ct);
                             Check.Null(result);
+                        }
+                    }),
+
+                Case(suite, "Server201_ReturnsNull",
+                    "Tokenize(list) returns null on a non-200 success code (201)",
+                    async ct =>
+                    {
+                        // Only HTTP 200 is treated as success; other 2xx codes yield null.
+                        using (MockHttpServer server = new MockHttpServer(req =>
+                            new MockHttpServer.Response
+                            {
+                                StatusCode = 201,
+                                Body = "{\"results\":[{\"text\":\"x\",\"tokens\":[\"x\"]}]}"
+                            }))
+                        {
+                            SpacyTokenizer t = new SpacyTokenizer(server.Endpoint);
+                            BatchTokenizationResult result = await t.Tokenize(new List<string> { "one", "two" }, ct);
+                            Check.Null(result);
+                        }
+                    }),
+
+                Case(suite, "WhitespaceElement_IsTransmitted",
+                    "Tokenize(list) accepts a whitespace element and transmits it (guard rejects only null/empty lists)",
+                    async ct =>
+                    {
+                        MockHttpServer.Request captured = null;
+                        using (MockHttpServer server = new MockHttpServer(req =>
+                        {
+                            captured = req;
+                            return new MockHttpServer.Response
+                            {
+                                StatusCode = 200,
+                                Body = "{\"results\":[{\"text\":\" \",\"tokens\":[]}]}"
+                            };
+                        }))
+                        {
+                            SpacyTokenizer t = new SpacyTokenizer(server.Endpoint);
+                            BatchTokenizationResult result = await t.Tokenize(new List<string> { "   " }, ct);
+
+                            Check.NotNull(result);
+                            Check.NotNull(captured, "Server should have received a request.");
+                            Check.Equal("POST", captured.Method);
+                            Check.Equal("/tokenize", captured.Path);
+
+                            // The whitespace element must survive to the wire under the "texts" array.
+                            using (JsonDocument doc = JsonDocument.Parse(captured.Body))
+                            {
+                                JsonElement texts = doc.RootElement.GetProperty("texts");
+                                Check.Equal(1, texts.GetArrayLength());
+                                Check.Equal("   ", texts[0].GetString());
+                            }
                         }
                     }),
 

@@ -43,7 +43,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="RestWrapper" Version="3.1.5" />
+		<PackageReference Include="RestWrapper" Version="3.2.0" />
 		<PackageReference Include="SerializationHelper" Version="2.0.3" />
 	</ItemGroup>
 
